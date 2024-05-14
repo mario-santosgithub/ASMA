@@ -1,5 +1,6 @@
 from src.cards import Card
 from src.utils import check_win
+from src.agents import *
 
 
 class Turn(object):
@@ -9,7 +10,7 @@ class Turn(object):
         - Chosen action by player
         - Counter action by oposite player in case of PL2 or PL4
     """
-    def __init__(self, deck, player_1, player_2, agent):
+    def __init__(self, deck, player_1, player_2):
         """
         Turn is initialized with standard deck, players and an open card
         """
@@ -31,7 +32,7 @@ class Turn(object):
             self.player_1.draw(self.deck, self.card_open)
             self.player_2.draw(self.deck, self.card_open)
             
-    def action(self, player, opponent, agent, algorithm):
+    def action(self, player, opponent, agent):
         """
         Only reflecting the active players' action if he hand has not won yet.
         Only one player is leveraging the RL-algorithm, while the other makes random choices.
@@ -45,9 +46,11 @@ class Turn(object):
         
         # (1) When player can play a card directly
         if len(player_act.hand_play) > 0:
-            
-            if player_act == self.player_1:
-                player_act.play_agent(self.deck, self.card_open, agent, algorithm)
+            print(type(player_act.getAgent()))
+            if isinstance(player_act.getAgent(), MonteCarloAgent):
+                player_act.play_agent(self.deck, self.card_open, agent)
+            elif isinstance(player_act.getAgent(), RandomAgent):
+                player_act.play_rand(self.deck)
             else:
                 player_act.play_rand(self.deck)
                 
@@ -62,8 +65,10 @@ class Turn(object):
             # (2a) When player draw a card that is finally playable
             if len(player_act.hand_play) > 0:
                 
-                if player_act == self.player_1:
-                    player_act.play_agent(self.deck, self.card_open, agent, algorithm)
+                if isinstance(player_act.getAgent(), MonteCarloAgent):
+                    player_act.play_agent(self.deck, self.card_open, agent)
+                elif isinstance(player_act.getAgent(), RandomAgent):
+                    player_act.play_rand(self.deck)
                 else:
                     player_act.play_rand(self.deck)
                 

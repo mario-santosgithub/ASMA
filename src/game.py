@@ -1,6 +1,6 @@
 import time
 
-from src.agents import QLearningAgent, MonteCarloAgent
+from src.agents import *
 from src.players import Player
 from src.turn import Turn
 from src.cards import Card, Deck
@@ -9,21 +9,19 @@ import config as conf
 
 
 class Game(object):
-    """
+    """ 
     A game reflects an iteration of turns, until one player fulfills the winning condition of 0 hand cards.
     It initialized with two players and a turn object.
     """
-    def __init__(self, player_1_name, player_2_name, starting_name, agent, algorithm, comment):
+    def __init__(self, player_1_name, player_2_name, starting_name, agents, comment):
         
         if comment == False: block_print()
-        
-        self.player_1 = Player(player_1_name, agent=agent)
-        self.player_2 = Player(player_2_name, agent=agent)
+        self.player_1 = Player(player_1_name, agent=agents[0])
+        self.player_2 = Player(player_2_name, agent=agents[1])
         self.turn = Turn(
             deck=Deck(), 
             player_1=self.player_1, 
-            player_2=self.player_2, 
-            agent=agent
+            player_2=self.player_2
         )
         
         self.turn_no = 0
@@ -36,20 +34,30 @@ class Game(object):
             bold (f'\n---------- TURN {self.turn_no} ----------')
             print (f'\nCurrent open card: {self.turn.card_open.print_card()}')
 
+            playing_agent = None
+            passing_agent = None
+
             if starting_name == self.player_1.name:
-                if self.turn_no%2 == 1: player_act, player_pas = self.player_1, self.player_2
-                else:                   player_act, player_pas = self.player_2, self.player_1
+                if self.turn_no%2 == 1: 
+                    player_act, player_pas = self.player_1, self.player_2
+                    playing_agent, passing_agent = agents[0], agents[1]
+                else:                   
+                    player_act, player_pas = self.player_2, self.player_1
+                    playing_agent, passing_agent = agents[1], agents[0]
             else:
-                if self.turn_no%2 == 0: player_act, player_pas = self.player_1, self.player_2
-                else:                   player_act, player_pas = self.player_2, self.player_1
+                if self.turn_no%2 == 0: 
+                    player_act, player_pas = self.player_1, self.player_2
+                    playing_agent, passing_agent = agents[0], agents[1]
+                else:                   
+                    player_act, player_pas = self.player_2, self.player_1
+                    playing_agent, passing_agent = agents[1], agents[0]
 
             player_act.show_hand()
             player_act.show_hand_play(card_open)
             self.turn.action(
                 player=player_act, 
                 opponent=player_pas, 
-                agent=agent,
-                algorithm=algorithm
+                agent=playing_agent
             )
             
             if check_win(player_act) == True:
@@ -69,28 +77,50 @@ class Game(object):
             if (self.turn.count > 0) and (self.turn.count %2 == 0):
                 print (f'Again it is {player_act.name}s turn')
                 self.turn_no = self.turn_no-1
+
+            print(self.player_2.action)
         
 
-        self.player_1.identify_state(card_open)
-        agent.update(self.player_1.state, self.player_1.action)
+        self.player_2.identify_state(card_open)
+        if isinstance(agents[1], QLearningAgent) or isinstance(agents[1], MonteCarloAgent):
+            agents[1].update(self.player_2.state, self.player_2.action)
                 
         if comment == False: enable_print()
 
 
-def tournament(iterations, algo, comment, agent_info):
+def selectAgent(behaviour):
+
+    if behaviour == "Random":
+        return RandomAgent()
+    
+    if behaviour == "monte-carlo":
+        return MonteCarloAgent()
+    
+    if behaviour == "CardCounter":
+        return CardCounterAgent()
+
+
+def tournament(iterations, agents, comment):
     """
     A function that iterates various Games and outputs summary statistics over all executed simulations.
     """
     timer_start = time.time()
     
     # Selection of algorithm
-    global agent, algorithm
-    algorithm = algo
-    
-    if algo == "q-learning":
-        agent = QLearningAgent(agent_info)
-    else:
-        agent = MonteCarloAgent(agent_info)
+    global agentList, agent1, agent2
+
+    # POR ENQUANTO APENAS 2 AGENTES
+    agentList = []
+    agent1 = selectAgent(agents[0])
+    agentList.append(agent1)
+
+    agent2 = selectAgent(agents[1])
+    agentList.append(agent2)
+
+    #if agents[0] == "q-learning":
+    #    agent = QLearningAgent()
+    #else:
+    #    agent = MonteCarloAgent()
     
     winners, turns, coverage = list(), list(), list()
 
@@ -102,8 +132,7 @@ def tournament(iterations, algo, comment, agent_info):
                 player_1_name=conf.player_name_1, 
                 player_2_name=conf.player_name_2,
                 starting_name=conf.player_name_2,
-                agent=agent,
-                algorithm=algo,
+                agents=agentList,
                 comment=comment
             )
         else:
@@ -111,18 +140,17 @@ def tournament(iterations, algo, comment, agent_info):
                 player_1_name=conf.player_name_1, 
                 player_2_name=conf.player_name_2,
                 starting_name=conf.player_name_1,
-                agent=agent,
-                algorithm=algo,
+                agents=agentList,
                 comment=comment
             )
 
         winners.append(game.winner)
         turns.append(game.turn_no)
-        coverage.append((agent.q != 0).values.sum())
+        coverage.append((agent2.q != 0).values.sum())
 
     # Timer
     timer_end = time.time()
     timer_dur = timer_end - timer_start
     print (f'Execution lasted {round(timer_dur/60,2)} minutes ({round(iterations/timer_dur,2)} games per second)')
     
-    return winners, turns, agent
+    return winners, turns, agent2

@@ -1,6 +1,11 @@
 params = {
     "iterations": 200,
-    "algorithm": "monte-carlo", # ["q-learning", "monte-carlo"]
+    "agents": [
+        "Random",
+        "monte-carlo",
+        "MostValue",
+        "CardCounter",
+    ], # ["q-learning", "monte-carlo"]
     "logging": False,
     "model": {
         "epsilon": 0.4,
@@ -8,5 +13,11 @@ params = {
     }
 }
 
-player_name_1 = "AI"
-player_name_2 = "Human"
+# Please, make the names 1 to for, the same order as the agents above. Thanks!
+# Possible agents:
+"Random, MostValue, LeastValue, CardCounter, monte-carlo, q-learning"
+
+player_name_1 = "Random"
+player_name_2 = "monte-carlo"
+player_name_3 = "MostValue"
+player_name_4 = "CardCounter"

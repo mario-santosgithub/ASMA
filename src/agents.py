@@ -6,11 +6,11 @@ import src.state_action_reward as sar
 
 
 class Agent(object):
-    def __init__(self, agent_info:dict):
+    def __init__(self):
         """Initializes the agent to get parameters and create an empty q-tables."""
 
-        self.epsilon     = agent_info["epsilon"]
-        self.step_size   = agent_info["step_size"]
+        self.epsilon     = 0.4
+        self.step_size   = 0.2
         self.states      = sar.states()
         self.actions     = sar.actions()
         self.R           = sar.rewards(self.states, self.actions)        
@@ -23,12 +23,45 @@ class Agent(object):
         
         self.visit = self.q.copy()
 
+class CardCounterAgent(Agent):
+
+    def __init_(self):
+        super().__init__()
+        self.played = 0
+        self.probMatrix = [0,0,0,0]
+
+class RandomAgent(Agent):
+        
+    def __init__(self):
+        super().__init__()
     
+    def step(self, state_dict, actions_dict):
+        """
+        Choose a random action.
+        Required parameters:
+            - state_dict as dict
+            - actions_dict as dict
+        """
+        actions_possible = [key for key,val in actions_dict.items() if val != 0]
+        action = random.choice(actions_possible)
+        
+        return action
+    
+    def update(self, state_dict, action):
+        """
+        No update for random agent.
+        Required parameters:
+            - state_dict as dict
+            - action as str
+        """
+        pass
+
+
 class QLearningAgent(Agent):
     
-    def __init__(self, agent_info:dict):        
+    def __init__(self):        
         
-        super().__init__(agent_info)
+        super().__init__()
         self.prev_state  = 0
         self.prev_action = 0
     
@@ -105,9 +138,9 @@ class QLearningAgent(Agent):
         
 class MonteCarloAgent(Agent):
 
-    def __init__(self, agent_info:dict):
+    def __init__(self):
 
-        super().__init__(agent_info)
+        super().__init__()
         self.state_seen  = list()
         self.action_seen = list()
         self.q_seen      = list()
@@ -160,9 +193,11 @@ class MonteCarloAgent(Agent):
             - state_dict as dict
             - action as str
         """
-        
+        print(action)
+        print("cócó")
         state  = [i for i in state_dict.values()]
         state  = tuple(state)
+        print(self.R)
         reward = self.R.loc[[state], action][0]
         
         # Update Q-values of all state-action pairs visited in the simulation

@@ -1,5 +1,6 @@
 import random
 from src.utils import underline
+from src.agents import * 
 
 
 class Player(object):
@@ -16,7 +17,11 @@ class Player(object):
         self.state        = dict()
         self.actions      = dict()
         self.action       = 0
+        self.agent        = agent
         agent.prev_state  = 0
+
+    def getAgent(self):
+        return self.agent
     
     def evaluate_hand(self, card_open):
         """
@@ -94,7 +99,7 @@ class Player(object):
         for key in wild_cards.keys():
             self.actions[key] = min([1 if card.value == key else 0 for card in self.hand_play].count(1),1)
      
-    def play_agent(self, deck, card_open, agent, algorithm):
+    def play_agent(self, deck, card_open, agent):
         """
         Reflecting a players' intelligent move supported by the RL-algorithm, that consists of:
             - Identification of the players' state and available actions
@@ -155,7 +160,8 @@ class Player(object):
             self.card_play.color = self.choose_color()
         
         # Update Q Value           
-        if algorithm == "q-learning":
+        if isinstance(agent, QLearningAgent) or isinstance(agent, MonteCarloAgent):
+            print("ENTROU")
             agent.update(self.state, self.action)      
 
     def play_rand(self, deck):

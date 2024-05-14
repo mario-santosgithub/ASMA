@@ -7,11 +7,14 @@ import config as conf
 
 def main():
 
+    if len(conf.params["agents"]) != 4:
+        print("Plese select 4 algorithms to compare on the config file.") 
+        return
+    print(conf.params["agents"])
     run = tournament(
         iterations = conf.params['iterations'],
-        algo       = conf.params['algorithm'],
-        comment    = conf.params['logging'],
-        agent_info = conf.params['model']
+        agents     = conf.params['agents'],
+        comment    = conf.params['logging']
     )
 
     result = pd.concat([
@@ -21,6 +24,9 @@ def main():
     
     result["win_rate"] = np.where(result["winner"]==conf.player_name_1,1,0)
     result["win_rate"] = result["win_rate"].cumsum()/(result.index+1)
+    
+    print("winrate player 1: ", result["win_rate"].iloc[-1])
+    print("winrate player 2: ", 1-result["win_rate"].iloc[-1])
 
     q_vals = pd.DataFrame(run[2].q)
     q_vals.index.rename("id", inplace=True)
