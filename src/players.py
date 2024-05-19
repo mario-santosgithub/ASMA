@@ -41,8 +41,29 @@ class Player(object):
             - deck as deck
             - card_open as card
         """
-        
         card = deck.draw_from_deck()
+
+        if isinstance(self.agent, CardCounterAgent): 
+            self.agent.drawn += 1
+            #print("drawn", self.agent.drawn)
+            if card.color == "RED":
+                self.agent.probMatrix[0] += 1
+            elif card.color == "GRE":
+                self.agent.probMatrix[1] += 1
+            elif card.color == "BLU": 
+                self.agent.probMatrix[2] += 1
+            elif card.color == "YEL":
+                self.agent.probMatrix[3] += 1
+            elif card.color == "WILD":
+                self.agent.probMatrix[4] += 1
+            else: 
+                print("error, please fix me")
+
+            
+            self.agent.checker.append(card)
+
+
+
         self.hand.append(card)
         self.evaluate_hand(card_open)
         print (f'{self.name} draws {card.print_card()}')
@@ -116,7 +137,7 @@ class Player(object):
         self.identify_action()
         
         # Agent selects action
-        self.action = agent.step(self.state, self.actions)
+        self.action = agent.step(self.state, self.actions, self.hand)
 
         # Selected action searches corresponding card
         # (1) Playing wild card

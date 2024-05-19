@@ -1,4 +1,5 @@
 import time
+import sys
 
 from src.agents import *
 from src.players import Player
@@ -6,6 +7,7 @@ from src.turn import Turn
 from src.cards import Card, Deck
 from src.utils import check_win, block_print, enable_print, bold
 import config as conf
+
 
 
 class Game(object):
@@ -63,11 +65,15 @@ class Game(object):
             if check_win(player_act) == True:
                 self.winner = player_act.name
                 print (f'{player_act.name} has won!')
+                if isinstance(player_act.agent, CardCounterAgent):
+                    player_act.agent.probMatrix = [0,0,0,0,0]
                 break
                 
             if check_win(player_pas) == True:
                 self.winner = player_pas.name
                 print (f'{player_pas.name} has won!')
+                if isinstance(player_pas.agent, CardCounterAgent):
+                    player_pas.agent.probMatrix = [0,0,0,0,0]
                 break
                 
             if player_act.card_play.value in ["REV", "SKIP"]:
@@ -77,8 +83,6 @@ class Game(object):
             if (self.turn.count > 0) and (self.turn.count %2 == 0):
                 print (f'Again it is {player_act.name}s turn')
                 self.turn_no = self.turn_no-1
-
-            print(self.player_2.action)
         
 
         self.player_2.identify_state(card_open)
@@ -98,7 +102,12 @@ def selectAgent(behaviour):
     
     if behaviour == "CardCounter":
         return CardCounterAgent()
-
+    
+    if behaviour == "MostValue":
+        return MostValueAgent()
+    
+    if behaviour == "LeastValue":
+        return LeastValueAgent()
 
 def tournament(iterations, agents, comment):
     """
@@ -126,7 +135,9 @@ def tournament(iterations, agents, comment):
 
     for i in range(iterations):
         time.sleep(0.01)
-
+        #sys.stdout.write(f'\r{i} of {iterations} games completed')1
+        sys.stdout.write(f'\r>> {(i/iterations)*100:.1f}% of games completed')
+        sys.stdout.flush()
         if i%2 == 1:
             game = Game(
                 player_1_name=conf.player_name_1, 

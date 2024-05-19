@@ -10,6 +10,7 @@ def main():
     if len(conf.params["agents"]) != 4:
         print("Plese select 4 algorithms to compare on the config file.") 
         return
+    
     print(conf.params["agents"])
     run = tournament(
         iterations = conf.params['iterations'],

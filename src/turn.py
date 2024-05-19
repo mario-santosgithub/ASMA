@@ -51,6 +51,8 @@ class Turn(object):
                 player_act.play_agent(self.deck, self.card_open, agent)
             elif isinstance(player_act.getAgent(), RandomAgent):
                 player_act.play_rand(self.deck)
+            elif isinstance(player_act.getAgent(), CardCounterAgent):
+                player_act.play_agent(self.deck, self.card_open, agent)
             else:
                 player_act.play_rand(self.deck)
                 
@@ -131,3 +133,6 @@ class Turn(object):
         else:
             print (f'\n{player_pas.name} has to draw {self.count*penalty} cards')
             for i in range (self.count*penalty): player_pas.draw(self.deck, self.card_open)
+
+    def notifyCardCounter():
+        pass

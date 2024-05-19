@@ -23,25 +23,128 @@ class Agent(object):
         
         self.visit = self.q.copy()
 
+class LeastValueAgent(Agent):
+        
+        def __init__(self):
+            super().__init__()
+        
+        def step(self, state_dict, actions_dict, hand):
+            """
+            Choose the action with the highest Q-value.
+            Required parameters:
+                - state_dict as dict
+                - actions_dict as dict
+            """
+
+            actions_possible = [key for key,val in actions_dict.items() if val != 0]
+
+            maxValue = 0
+            minIndex = 0
+            for card in hand:
+                if card.value < maxValue and card.color in actions_possible:
+                    maxValue = card.value
+                    minIndex = hand.index(card)
+
+            return hand[minIndex].color
+        
+
+        def update(self, state_dict, action):
+            """
+            No update for most value agent.
+            Required parameters:
+                - state_dict as dict
+                - action as str
+            """
+            pass
+
+
+class MostValueAgent(Agent):
+        
+        def __init__(self):
+            super().__init__()
+        
+        def step(self, state_dict, actions_dict, hand):
+            """
+            Choose the action with the highest Q-value.
+            Required parameters:
+                - state_dict as dict
+                - actions_dict as dict
+            """
+
+            actions_possible = [key for key,val in actions_dict.items() if val != 0]
+
+            maxValue = 0
+            minIndex = 0
+            for card in hand:
+                if card.value > maxValue and card.color in actions_possible:
+                    maxValue = card.value
+                    minIndex = hand.index(card)
+
+            return hand[minIndex].color
+        
+
+        def update(self, state_dict, action):
+            """
+            No update for most value agent.
+            Required parameters:
+                - state_dict as dict
+                - action as str
+            """
+            pass
+
+
 class CardCounterAgent(Agent):
 
-    def __init_(self):
+    def __init__(self):
         super().__init__()
-        self.played = 0
-        self.probMatrix = [0,0,0,0]
+        self.checker = []
+        self.drawn = 0
+
+        # for now just colors
+        # 0 = red, 1 = blue, 2 = green, 3 = yellow, 4 = wild
+        self.probMatrix = [0,0,0,0,0]
+
+    def step(self, state_dict, actions_dict, hand):
+        
+        actions_possible = [key for key,val in actions_dict.items() if val != 0]
+        minValue = 1000
+        minIndex = 0
+        for card in actions_possible:
+            if card == "RED" and self.probMatrix[0] > minValue:
+                minValue = self.probMatrix[0]
+                minIndex = actions_possible.index(card)
+            elif card == "GRE" and self.probMatrix[1] > minValue:
+                minValue = self.probMatrix[1]
+                minIndex = actions_possible.index(card)
+            elif card == "BLU" and self.probMatrix[2] > minValue:
+                minValue = self.probMatrix[2]
+                minIndex = actions_possible.index(card)
+            elif card == "YEL" and self.probMatrix[3] > minValue:
+                minValue = self.probMatrix[3]
+                minIndex = actions_possible.index(card)
+            elif card == "WILD" and self.probMatrix[4] > minValue:
+                minValue = self.probMatrix[4]
+                minIndex = actions_possible.index(card)
+
+        return actions_possible[minIndex]
+
 
 class RandomAgent(Agent):
         
     def __init__(self):
         super().__init__()
     
-    def step(self, state_dict, actions_dict):
+    def step(self, state_dict, actions_dict, hand):
         """
         Choose a random action.
         Required parameters:
             - state_dict as dict
             - actions_dict as dict
         """
+        print("state_dict", state_dict)
+        print("\n")
+        print("actions_dict", actions_dict)
+
         actions_possible = [key for key,val in actions_dict.items() if val != 0]
         action = random.choice(actions_possible)
         
@@ -65,7 +168,7 @@ class QLearningAgent(Agent):
         self.prev_state  = 0
         self.prev_action = 0
     
-    def step(self, state_dict, actions_dict):
+    def step(self, state_dict, actions_dict, hand):
         """
         Choose the optimal next action according to the followed policy.
         Required parameters:
@@ -145,7 +248,7 @@ class MonteCarloAgent(Agent):
         self.action_seen = list()
         self.q_seen      = list()
     
-    def step(self, state_dict, actions_dict):
+    def step(self, state_dict, actions_dict, hand):
         """
         Choose the optimal next action according to the followed policy.
         Required parameters:
