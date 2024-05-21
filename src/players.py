@@ -251,3 +251,17 @@ class Player(object):
         self.evaluate_hand(card_open)
         for card in self.hand_play:
             card.show_card()
+
+    def calculate_hand_value(self):
+        """
+        Calculate the total value of the player's hand based on Uno's scoring rules.
+        """
+        points = 0
+        for card in self.hand:
+            if isinstance(card.value, int):
+                points += card.value
+            elif card.value in ["SKIP", "REV", "PL2"]:
+                points += 20
+            elif card.value in ["COL", "PL4"]:
+                points += 50
+        return points

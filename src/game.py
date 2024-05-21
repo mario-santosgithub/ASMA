@@ -29,6 +29,14 @@ class Game(object):
         self.turn_no = 0
         self.winner = 0
 
+        # Number of cards played by each player
+        self.cards_played_player_1 = 0
+        self.cards_played_player_2 = 0
+
+        # Initialize variables to store the hand values
+        self.hand_value_player_1 = 0
+        self.hand_value_player_2 = 0
+
         # With each new game the starting player is switched, in order to make it fair
         while self.winner == 0:
             self.turn_no += 1
@@ -61,6 +69,12 @@ class Game(object):
                 opponent=player_pas, 
                 agent=playing_agent
             )
+
+            # Update number of cards played by the active player
+            if player_act == self.player_1:
+                self.cards_played_player_1 += 1
+            else:
+                self.cards_played_player_2 += 1
             
             if check_win(player_act) == True:
                 self.winner = player_act.name
@@ -90,6 +104,9 @@ class Game(object):
             agents[1].update(self.player_2.state, self.player_2.action)
                 
         if comment == False: enable_print()
+
+        self.hand_value_player_1 = self.player_1.calculate_hand_value()
+        self.hand_value_player_2 = self.player_2.calculate_hand_value()
 
 
 def selectAgent(behaviour):
@@ -133,6 +150,15 @@ def tournament(iterations, agents, comment):
     
     winners, turns, coverage = list(), list(), list()
 
+    cards_played_player_1_list, cards_played_player_2_list = list(), list()  # Lists to store cards played by each player
+
+    hand_value_player_1, hand_value_player_2 = list(), list() # Lists to store value of hand by each player
+
+    score_player_1 = 0
+    score_player_2 = 0
+
+    hand_value_player_1_cumsum, hand_value_player_2_cumsum = list(), list()
+
     for i in range(iterations):
         time.sleep(0.01)
         #sys.stdout.write(f'\r{i} of {iterations} games completed')1
@@ -159,9 +185,32 @@ def tournament(iterations, agents, comment):
         turns.append(game.turn_no)
         coverage.append((agent2.q != 0).values.sum())
 
+        cards_played_player_1_list.append(game.cards_played_player_1)
+        cards_played_player_2_list.append(game.cards_played_player_2)
+        hand_value_player_1.append(game.hand_value_player_1)
+        hand_value_player_2.append(game.hand_value_player_2)
+
+        score_player_1 += game.hand_value_player_1
+        score_player_2 += game.hand_value_player_2
+
+        hand_value_player_1_cumsum.append(score_player_1)
+        hand_value_player_2_cumsum.append(score_player_2)
+
+    # Calculate the total points for each player
+    total_points_player_1 = hand_value_player_1_cumsum[-1]
+    total_points_player_2 = hand_value_player_2_cumsum[-1]
+
+    # Determine the winner of the tournament based on total points
+    if total_points_player_1 < total_points_player_2:
+        overall_winner = conf.player_name_1
+    elif total_points_player_1 > total_points_player_2:
+        overall_winner = conf.player_name_2
+    else:
+        overall_winner = "It's a tie"
     # Timer
     timer_end = time.time()
     timer_dur = timer_end - timer_start
     print (f'Execution lasted {round(timer_dur/60,2)} minutes ({round(iterations/timer_dur,2)} games per second)')
+    print(f'The winner of the tournament is: {overall_winner} with {total_points_player_1} points vs {total_points_player_2} points')
     
-    return winners, turns, agent2
+    return winners, turns, agent2, cards_played_player_1_list, cards_played_player_2_list, hand_value_player_1, hand_value_player_2, hand_value_player_1_cumsum, hand_value_player_2_cumsum
