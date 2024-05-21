@@ -141,45 +141,65 @@ class Player(object):
 
         # Selected action searches corresponding card
         # (1) Playing wild card
-        if self.action in ["COL","PL4"]:
+        if isinstance(agent, MostValueAgent):
+            self.card_play = self.hand[self.action]
+            card = self.card_play
+            print("carta do if", card)
+        if self.action in ["COL","PL4"] and not isinstance(agent, MostValueAgent):
             for card in self.hand:            
                 if card.value == self.action:
+                    print("caiu1")
                     break
 
         # (2) Playing normal card with different color
-        elif (self.action in ["RED","GRE","BLU", "YEL"]) and (self.action != card_open.color):
+        elif (self.action in ["RED","GRE","BLU", "YEL"]) and (self.action != card_open.color) and not isinstance(agent, MostValueAgent):
             for card in self.hand:
                 if (card.color == self.action) and (card.value == card_open.value):
+                    print("caiu2")
                     break
 
         # (3) Playing normal card with same color
-        elif (self.action in ["RED","GRE","BLU", "YEL"]) and (self.action == card_open.color):
+        elif (self.action in ["RED","GRE","BLU", "YEL"]) and (self.action == card_open.color) and not isinstance(agent, MostValueAgent):
             for card in self.hand:
+                if (card.color == self.action) and (card.value in range(0,10) and isinstance(agent, MostValueAgent)):
+                    print("caiu3")
+                    break
                 if (card.color == self.action) and (card.value in range(0,10)):
+                    print("caiu3")
                     break
 
         # (4) Playing special card with same color
-        elif (self.action not in ["RED","GRE","BLU", "YEL"]) and (self.action != card_open.value):
+        elif (self.action not in ["RED","GRE","BLU", "YEL"]) and (self.action != card_open.value) and not isinstance(agent, MostValueAgent):
             for card in self.hand:
                 if (card.color == card_open.color) and (card.value == self.action):
+                    print("caiu4")
                     break
 
         # (5) Playing special card with different color
         else:
-            for card in self.hand:
-                if card.value == self.action:
-                    break
+            if not isinstance(agent, MostValueAgent):
+                for card in self.hand:
+                    if card.value == self.action:
+                        print("caiu5")
+                        break
 
         # Selected card is played
-        self.card_play = card
+        if not isinstance(agent, MostValueAgent):
+            self.card_play = card
+        print("cartaPlayers", card)
         self.hand.remove(card)
         self.hand_play.pop()
         deck.discard(card)
         print (f'\n{self.name} plays {card.print_card()}')
 
-        if (self.card_play.value in ["COL","PL4"]):
-            self.card_play.color = self.choose_color()
+        if not isinstance(agent, MostValueAgent):
+            if (self.card_play.value in ["COL","PL4"]):
+                self.card_play.color = self.choose_color()
         
+        if isinstance(agent, MostValueAgent):
+            if (card.value in ["COL","PL4"]):
+                card.color = self.choose_color()
+
         # Update Q Value           
         if isinstance(agent, QLearningAgent) or isinstance(agent, MonteCarloAgent):
             agent.update(self.state, self.action)      
