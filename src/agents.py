@@ -36,15 +36,16 @@ class LeastValueAgent(Agent):
                 - actions_dict as dict
             """
 
-            actions_possible = [key for key,val in actions_dict.items() if val != 0]
 
-            maxValue = 0
-            minIndex = 0
+            minValue = 100
+            minIndex = 100
             for card in hand:
-                if card.value < maxValue and card.color in actions_possible:
-                    maxValue = card.value
+                print("min:", minValue)
+                print("card:", card.value)
+                if type(card.value) != str and card.value != 0 and card.value < minValue:
+                    minValue = card.value
                     minIndex = hand.index(card)
-
+            #print("min:", minValue)
             return hand[minIndex].color
         
 
@@ -70,17 +71,22 @@ class MostValueAgent(Agent):
                 - state_dict as dict
                 - actions_dict as dict
             """
-
             actions_possible = [key for key,val in actions_dict.items() if val != 0]
 
             maxValue = 0
-            minIndex = 0
+            maxIndex = 0
             for card in hand:
-                if card.value > maxValue and card.color in actions_possible:
+                if type(card.value) != str and card.value != 0 and card.value > maxValue:
                     maxValue = card.value
-                    minIndex = hand.index(card)
+                    maxIndex = hand.index(card)
+                elif card.value in ["SKI", "REV", "PL2"] and card.value in actions_possible:
+                    maxValue = 20
+                    maxIndex = hand.index(card)
+                elif card.value in ["COL", "PL4"] and card.value in actions_possible:
+                    maxValue = 50
+                    maxIndex = hand.index(card)
 
-            return hand[minIndex].color
+            return hand[maxIndex].color
         
 
         def update(self, state_dict, action):

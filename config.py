@@ -1,10 +1,10 @@
 params = {
-    "iterations": 2000,
+    "iterations": 10000,
     "agents": [
         "Random",
         "CardCounter",
         "MostValue",
-        "CardCounter"
+        "LeastValue"
     ], # ["q-learning", "monte-carlo"]
     "logging": False,
     "model": {
@@ -20,4 +20,4 @@ params = {
 player_name_1 = "Random"
 player_name_2 = "CardCounter"
 player_name_3 = "MostValue"
-player_name_4 = "Random"
+player_name_4 = "LeastValue"

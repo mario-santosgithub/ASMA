@@ -10,7 +10,7 @@ class Turn(object):
         - Chosen action by player
         - Counter action by oposite player in case of PL2 or PL4
     """
-    def __init__(self, deck, player_1, player_2):
+    def __init__(self, deck, player_1, player_2, player_3, player_4):
         """
         Turn is initialized with standard deck, players and an open card
         """
@@ -18,6 +18,8 @@ class Turn(object):
         self.deck = deck
         self.player_1 = player_1
         self.player_2 = player_2
+        self.player_3 = player_3
+        self.player_4 = player_4
         self.card_open = self.deck.draw_from_deck()
         self.start_up()
     
@@ -31,6 +33,8 @@ class Turn(object):
         for i in range (7):
             self.player_1.draw(self.deck, self.card_open)
             self.player_2.draw(self.deck, self.card_open)
+            self.player_3.draw(self.deck, self.card_open)
+            self.player_4.draw(self.deck, self.card_open)
             
     def action(self, player, opponent, agent):
         """
@@ -46,12 +50,15 @@ class Turn(object):
         
         # (1) When player can play a card directly
         if len(player_act.hand_play) > 0:
-            print(type(player_act.getAgent()))
             if isinstance(player_act.getAgent(), MonteCarloAgent):
                 player_act.play_agent(self.deck, self.card_open, agent)
             elif isinstance(player_act.getAgent(), RandomAgent):
                 player_act.play_rand(self.deck)
             elif isinstance(player_act.getAgent(), CardCounterAgent):
+                player_act.play_agent(self.deck, self.card_open, agent)
+            elif isinstance(player_act.getAgent(), LeastValueAgent):
+                player_act.play_agent(self.deck, self.card_open, agent)
+            elif isinstance(player_act.getAgent(), MostValueAgent):
                 player_act.play_agent(self.deck, self.card_open, agent)
             else:
                 player_act.play_rand(self.deck)
@@ -71,6 +78,12 @@ class Turn(object):
                     player_act.play_agent(self.deck, self.card_open, agent)
                 elif isinstance(player_act.getAgent(), RandomAgent):
                     player_act.play_rand(self.deck)
+                elif isinstance(player_act.getAgent(), CardCounterAgent):
+                    player_act.play_agent(self.deck, self.card_open, agent)
+                elif isinstance(player_act.getAgent(), LeastValueAgent):
+                    player_act.play_agent(self.deck, self.card_open, agent)
+                elif isinstance(player_act.getAgent(), MostValueAgent):
+                    player_act.play_agent(self.deck, self.card_open, agent)
                 else:
                     player_act.play_rand(self.deck)
                 
@@ -84,15 +97,15 @@ class Turn(object):
         if check_win(player_act) == True: return
         if check_win(player_pas) == True: return
         
-        if player_act.card_play.value == "PL4":
-            self.action_plus(player   = player_act, 
-                             opponent = player_pas, 
-                             penalty  = 4)
-        
-        if player_act.card_play.value == "PL2":
-            self.action_plus(player   = player_act, 
-                             opponent = player_pas, 
-                             penalty  = 2)
+        #if player_act.card_play.value == "PL4":
+        #    self.action_plus(player   = player_act, 
+        #                     opponent = player_pas, 
+        #                     penalty  = 4)
+        #
+        #if player_act.card_play.value == "PL2":
+        #    self.action_plus(player   = player_act, 
+        #                     opponent = player_pas, 
+        #                     penalty  = 2)
         
     def action_plus(self, player, opponent, penalty):
         """
@@ -126,7 +139,7 @@ class Turn(object):
                         
             if check_win(player_act) == True: return
         
-        if self.count%2 == 0:
+        if self.count%4 == 0:
             print (f'\n{player_act.name} has to draw {self.count*penalty} cards')
             for i in range (self.count*penalty): player_act.draw(self.deck, self.card_open)
 

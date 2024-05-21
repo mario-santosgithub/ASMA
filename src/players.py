@@ -259,7 +259,7 @@ class Player(object):
         for card in self.hand:
             if isinstance(card.value, int):
                 points += card.value
-            elif card.value in ["SKIP", "REV", "PL2"]:
+            elif card.value in ["SKI", "REV", "PL2"]:
                 points += 20
             elif card.value in ["COL", "PL4"]:
                 points += 50
