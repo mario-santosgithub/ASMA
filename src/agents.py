@@ -141,9 +141,6 @@ class RandomAgent(Agent):
             - state_dict as dict
             - actions_dict as dict
         """
-        print("state_dict", state_dict)
-        print("\n")
-        print("actions_dict", actions_dict)
 
         actions_possible = [key for key,val in actions_dict.items() if val != 0]
         action = random.choice(actions_possible)
@@ -217,14 +214,14 @@ class QLearningAgent(Agent):
             this_q = self.q.loc[[state], action][0]
             reward = self.R.loc[[state], action][0]
             
-            print ("\n")
-            print (f'prev_q: {prev_q}')
-            print (f'this_q: {this_q}')
-            print (f'prev_state: {self.prev_state}')
-            print (f'this_state: {state}')
-            print (f'prev_action: {self.prev_action}')
-            print (f'this_action: {action}')
-            print (f'reward: {reward}')
+            #print ("\n")
+            #print (f'prev_q: {prev_q}')
+            #print (f'this_q: {this_q}')
+            #print (f'prev_state: {self.prev_state}')
+            #print (f'this_state: {state}')
+            #print (f'prev_action: {self.prev_action}')
+            #print (f'this_action: {action}')
+            #print (f'reward: {reward}')
             
             # Calculate new Q-values
             if reward == 0:
@@ -296,16 +293,13 @@ class MonteCarloAgent(Agent):
             - state_dict as dict
             - action as str
         """
-        print(action)
-        print("cócó")
+
         state  = [i for i in state_dict.values()]
         state  = tuple(state)
-        print(self.R)
         reward = self.R.loc[[state], action][0]
         
         # Update Q-values of all state-action pairs visited in the simulation
         for s,a in zip(self.state_seen, self.action_seen): 
             self.q.loc[[s], a] += self.step_size * (reward - self.q.loc[[s], a])
-            print (self.q.loc[[s],a])
         
         self.state_seen, self.action_seen, self.q_seen = list(), list(), list()
