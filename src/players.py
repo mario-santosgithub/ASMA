@@ -182,7 +182,6 @@ class Player(object):
         
         # Update Q Value           
         if isinstance(agent, QLearningAgent) or isinstance(agent, MonteCarloAgent):
-            print("ENTROU")
             agent.update(self.state, self.action)      
 
     def play_rand(self, deck):

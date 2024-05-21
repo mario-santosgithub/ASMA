@@ -142,11 +142,6 @@ def tournament(iterations, agents, comment):
 
     agent2 = selectAgent(agents[1])
     agentList.append(agent2)
-
-    #if agents[0] == "q-learning":
-    #    agent = QLearningAgent()
-    #else:
-    #    agent = MonteCarloAgent()
     
     winners, turns, coverage = list(), list(), list()
 
