@@ -75,18 +75,30 @@ class MostValueAgent(Agent):
 
             maxValue = 0
             maxIndex = 0
+            print("actionsPossible", actions_possible)
             for card in hand:
-                if type(card.value) != str and card.value != 0 and card.value > maxValue:
+                print("numero", card)
+                print("max:", maxValue)
+                print("card.value:", card.value)
+                print("type", type(card.value))
+                if type(card.value) != str and card.value != 0 and card.value > maxValue and (card.color in actions_possible):
+                    print("é possivel")
                     maxValue = card.value
                     maxIndex = hand.index(card)
+                    print("index:", hand.index(card))
                 elif card.value in ["SKI", "REV", "PL2"] and card.value in actions_possible:
-                    maxValue = 20
-                    maxIndex = hand.index(card)
-                elif card.value in ["COL", "PL4"] and card.value in actions_possible:
-                    maxValue = 50
-                    maxIndex = hand.index(card)
-
-            return hand[maxIndex].color
+                    if 20 > maxValue:
+                        maxValue = 20
+                        maxIndex = hand.index(card)
+                    print("index:", hand.index(card))
+                elif card.value in ["COL", "PL4"]:
+                    if 50 > maxValue:
+                        maxValue = 50
+                        maxIndex = hand.index(card)
+                    print("index:", hand.index(card))
+            print("indexMaxFinal:", maxIndex)
+            print("indexFinal:", hand[maxIndex].color)
+            return maxIndex
         
 
         def update(self, state_dict, action):
@@ -131,7 +143,6 @@ class CardCounterAgent(Agent):
             elif card == "WILD" and self.probMatrix[4] > minValue:
                 minValue = self.probMatrix[4]
                 minIndex = actions_possible.index(card)
-
         return actions_possible[minIndex]
 
 
