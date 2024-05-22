@@ -35,18 +35,34 @@ class LeastValueAgent(Agent):
                 - state_dict as dict
                 - actions_dict as dict
             """
-
+            actions_possible = [key for key,val in actions_dict.items() if val != 0]
 
             minValue = 100
             minIndex = 100
+            print("actionsPossible", actions_possible)
             for card in hand:
+                print("numero", card)
                 print("min:", minValue)
-                print("card:", card.value)
-                if type(card.value) != str and card.value != 0 and card.value < minValue:
+                print("card.value:", card.value)
+                print("type", type(card.value))
+                if type(card.value) != str and card.value != 0 and card.value < minValue and (card.color in actions_possible):
+                    print("é possivel")
                     minValue = card.value
                     minIndex = hand.index(card)
-            #print("min:", minValue)
-            return hand[minIndex].color
+                    print("index:", hand.index(card))
+                elif card.value in ["SKI", "REV", "PL2"] and card.value in actions_possible:
+                    if 20 < minValue:
+                        minValue = 20
+                        minIndex = hand.index(card)
+                    print("index:", hand.index(card))
+                elif card.value in ["COL", "PL4"]:
+                    if 50 < minValue:
+                        minValue = 50
+                        minIndex = hand.index(card)
+                    print("index:", hand.index(card))
+            print("indexMinFinal:", minIndex)
+            print("indexFinal:", hand[minIndex].color)
+            return minIndex
         
 
         def update(self, state_dict, action):
@@ -75,6 +91,7 @@ class MostValueAgent(Agent):
 
             maxValue = 0
             maxIndex = 0
+            print("actionsDict", actions_dict)
             print("actionsPossible", actions_possible)
             for card in hand:
                 print("numero", card)
