@@ -50,7 +50,9 @@ class Turn(object):
         
         # (1) When player can play a card directly
         if len(player_act.hand_play) > 0:
-            if isinstance(player_act.getAgent(), MonteCarloAgent):
+            if isinstance(player_act.getAgent(), RLTwoAgent):
+                player_act.play_agent(self.deck, self.card_open, agent)
+            elif isinstance(player_act.getAgent(), RLOneAgent):
                 player_act.play_agent(self.deck, self.card_open, agent)
             elif isinstance(player_act.getAgent(), RandomAgent):
                 player_act.play_rand(self.deck)
@@ -74,10 +76,12 @@ class Turn(object):
             # (2a) When player draw a card that is finally playable
             if len(player_act.hand_play) > 0:
                 
-                if isinstance(player_act.getAgent(), MonteCarloAgent):
+                if isinstance(player_act.getAgent(), RLTwoAgent):
                     player_act.play_agent(self.deck, self.card_open, agent)
                 elif isinstance(player_act.getAgent(), RandomAgent):
                     player_act.play_rand(self.deck)
+                elif isinstance(player_act.getAgent(), RLOneAgent):
+                    player_act.play_agent(self.deck, self.card_open, agent)
                 elif isinstance(player_act.getAgent(), CardCounterAgent):
                     player_act.play_agent(self.deck, self.card_open, agent)
                 elif isinstance(player_act.getAgent(), LeastValueAgent):

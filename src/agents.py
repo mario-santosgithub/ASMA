@@ -166,7 +166,7 @@ class RandomAgent(Agent):
         pass
 
 
-class QLearningAgent(Agent):
+class RLOneAgent(Agent):
     
     def __init__(self):        
         
@@ -245,7 +245,7 @@ class QLearningAgent(Agent):
         self.prev_action = action
       
         
-class MonteCarloAgent(Agent):
+class RLTwoAgent(Agent):
 
     def __init__(self):
 

@@ -11,17 +11,28 @@ import config as conf
 
 
 class Game(object):
-    """ 
-    A game reflects an iteration of turns, until one player fulfills the winning condition of 0 hand cards.
-    It initialized with two players and a turn object.
-    """
+    
     def __init__(self, player_1_name, player_2_name, player_3_name, player_4_name, starting_name, agents, comment):
         
-        if comment == False: block_print()
         self.player_1 = Player(player_1_name, agent=agents[0])
         self.player_2 = Player(player_2_name, agent=agents[1])
         self.player_3 = Player(player_3_name, agent=agents[2])
         self.player_4 = Player(player_4_name, agent=agents[3])
+
+        rl1Agent = None
+        rl1Player = None
+        rl2Agent = None
+        rl2Player = None
+        # Check if there are any RL agents in the game
+        for agent in agents:
+            if isinstance(agent, RLOneAgent):
+                if rl1Agent == None:
+                    rl1Agent = agent
+            elif isinstance(agent, RLTwoAgent):
+                if rl2Agent == None:
+                    rl2Agent = agent
+
+        if comment == False: block_print()
         self.turn = Turn(
             deck=Deck(), 
             player_1=self.player_1, 
@@ -53,6 +64,7 @@ class Game(object):
         playing_agent = None
         passing_agent = None
         
+        # Determine the starting player
         i = 0
 
         if starting_name == self.player_1.name:
@@ -175,11 +187,14 @@ class Game(object):
                 player_pas = self.player[(i-1)%4]
                 passing_agent = agents[(i-1)%4]
 
-        #    x = input("...")
-        # for q-learning agent, check later
-        self.player_2.identify_state(card_open)
-        if isinstance(agents[1], QLearningAgent) or isinstance(agents[1], MonteCarloAgent):
-            agents[1].update(self.player_2.state, self.player_2.action)
+        # Update the state-action pairs for the RL agents, if they exist
+        if rl1Agent != None:
+            self.player_3.identify_state(card_open)
+            rl1Agent.update(self.player_3.state, self.player_3.action)
+
+        if rl2Agent != None:
+            self.player_4.identify_state(card_open)
+            rl2Agent.update(self.player_4.state, self.player_4.action)
                 
         if comment == False: enable_print()
 
@@ -194,8 +209,11 @@ def selectAgent(behaviour):
     if behaviour == "Random":
         return RandomAgent()
     
-    if behaviour == "monte-carlo":
-        return MonteCarloAgent()
+    if behaviour == "RLOne":
+        return RLOneAgent()
+    
+    if behaviour == "RLTwo":
+        return RLTwoAgent()
     
     if behaviour == "CardCounter":
         return CardCounterAgent()
@@ -207,15 +225,11 @@ def selectAgent(behaviour):
         return LeastValueAgent()
 
 def tournament(iterations, agents, comment):
-    """
-    A function that iterates various Games and outputs summary statistics over all executed simulations.
-    """
+
     timer_start = time.time()
     
-    # Selection of algorithm
     global agentList, agent1, agent2, agent3, agent4
 
-    # POR ENQUANTO APENAS 2 AGENTES
     agentList = []
     agent1 = selectAgent(agents[0])
     agentList.append(agent1)

@@ -4,10 +4,6 @@ from src.agents import *
 
 
 class Player(object):
-    """
-    Player consists of a list of cards representing a players hand cards.
-    Player can have a name, hand, playable hand. Thereform the players' state can be determined.
-    """
     
     def __init__(self, name, agent):
         self.name         = name
@@ -24,10 +20,7 @@ class Player(object):
         return self.agent
     
     def evaluate_hand(self, card_open):
-        """
-        Loops through each card in players' hand. Evaluation depends on card open.
-        Required parameters: card_open as card
-        """
+
         
         self.hand_play.clear()
         for card in self.hand:
@@ -35,12 +28,7 @@ class Player(object):
                 self.hand_play.append(card)
     
     def draw(self, deck, card_open):
-        """
-        Adds a card to players' hand and evaluates the hand
-        Required parameters:
-            - deck as deck
-            - card_open as card
-        """
+
         card = deck.draw_from_deck()
 
         if isinstance(self.agent, CardCounterAgent): 
@@ -120,17 +108,7 @@ class Player(object):
             self.actions[key] = min([1 if card.value == key else 0 for card in self.hand_play].count(1),1)
      
     def play_agent(self, deck, card_open, agent):
-        """
-        Reflecting a players' intelligent move supported by the RL-algorithm, that consists of:
-            - Identification of the players' state and available actions
-            - Choose card_played
-            - Remove card from hand & replace card_open with it
-            - Update Q-values in case of TD
-            
-        Required parameters:
-            - deck as deck
-            - card_open as card
-        """
+
 
         # Identify state & actions for action selection
         self.identify_state(card_open)
@@ -200,18 +178,10 @@ class Player(object):
                 card.color = self.choose_color()
 
         # Update Q Value           
-        if isinstance(agent, QLearningAgent) or isinstance(agent, MonteCarloAgent):
+        if isinstance(agent, RLOneAgent) or isinstance(agent, RLTwoAgent):
             agent.update(self.state, self.action)      
 
     def play_rand(self, deck):
-        """
-        Reflecting a players' random move, that consists of:
-            - Shuffling players' hand cards
-            - Lopping through hand cards and choosing the first available hand card to be played
-            - Remove card from hand & replace card_open with it
-        
-        Required parameters: deck as deck
-        """
         
         random.shuffle(self.hand_play)
         for card in self.hand:
@@ -227,13 +197,6 @@ class Player(object):
             self.card_play.color = self.choose_color()  
             
     def play_counter(self, deck, card_open, plus_card):
-        """
-        Reflecting a players' counter move to a plus card.
-        Required parameters:
-            - deck as deck
-            - card_open as card
-            - plus_card as card
-        """
         
         for card in self.hand:
             if card == plus_card:
@@ -245,10 +208,6 @@ class Player(object):
                 break
         
     def choose_color(self):
-        """
-        Chooses a card color when a player plays PL4 or WILD COL.
-        Color is determined by the majority color in the active players' hand.
-        """
         
         colors = [card.color for card in self.hand if card.color in ["RED","GRE","BLU","YEL"]]
         if len(colors)>0:
