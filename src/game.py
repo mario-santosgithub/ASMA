@@ -17,7 +17,7 @@ class Game(object):
     """
     def __init__(self, player_1_name, player_2_name, player_3_name, player_4_name, starting_name, agents, comment):
         
-        #if comment == False: block_print()
+        if comment == False: block_print()
         self.player_1 = Player(player_1_name, agent=agents[0])
         self.player_2 = Player(player_2_name, agent=agents[1])
         self.player_3 = Player(player_3_name, agent=agents[2])
@@ -153,15 +153,12 @@ class Game(object):
                     i = (i+1)%4
                 else:
                     i = (i-1)%4
-
-                print("REV")
         
             elif player_act.card_play.value == "SKI":
                 if self.flag:
                     i = (i+2)%4
                 else:
                     i = (i-2)%4
-                print("SKIP")
 
             else:
                 if self.flag:
@@ -178,14 +175,13 @@ class Game(object):
                 player_pas = self.player[(i-1)%4]
                 passing_agent = agents[(i-1)%4]
 
-            x = input("...")
-
+        #    x = input("...")
         # for q-learning agent, check later
         self.player_2.identify_state(card_open)
         if isinstance(agents[1], QLearningAgent) or isinstance(agents[1], MonteCarloAgent):
             agents[1].update(self.player_2.state, self.player_2.action)
                 
-        #if comment == False: enable_print()
+        if comment == False: enable_print()
 
         self.hand_value_player_1 = self.player_1.calculate_hand_value()
         self.hand_value_player_2 = self.player_2.calculate_hand_value()

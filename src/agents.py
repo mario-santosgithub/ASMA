@@ -28,40 +28,27 @@ class LeastValueAgent(Agent):
         def __init__(self):
             super().__init__()
         
-        def step(self, state_dict, actions_dict, hand):
+        def step(self, state_dict, actions_dict, hand, card_open):
             """
             Choose the action with the highest Q-value.
             Required parameters:
                 - state_dict as dict
                 - actions_dict as dict
             """
-            actions_possible = [key for key,val in actions_dict.items() if val != 0]
-
             minValue = 100
             minIndex = 100
-            print("actionsPossible", actions_possible)
+            
             for card in hand:
-                print("numero", card)
-                print("min:", minValue)
-                print("card.value:", card.value)
-                print("type", type(card.value))
-                if type(card.value) != str and card.value != 0 and card.value < minValue and (card.color in actions_possible):
-                    print("é possivel")
+                if type(card.value) != str and (card.value == card_open.value or card.color == card_open.color) and card.value < minValue:
                     minValue = card.value
                     minIndex = hand.index(card)
-                    print("index:", hand.index(card))
-                elif card.value in ["SKI", "REV", "PL2"] and card.value in actions_possible:
-                    if 20 < minValue:
-                        minValue = 20
-                        minIndex = hand.index(card)
-                    print("index:", hand.index(card))
-                elif card.value in ["COL", "PL4"]:
-                    if 50 < minValue:
-                        minValue = 50
-                        minIndex = hand.index(card)
-                    print("index:", hand.index(card))
-            print("indexMinFinal:", minIndex)
-            print("indexFinal:", hand[minIndex].color)
+
+                elif card.value in ["SKI", "REV", "PL2"] and (card.color == card_open.color or card.value == card_open.value) and minValue > 20:
+                    minValue = 20
+                    minIndex = hand.index(card)
+                elif card.value in ["COL", "PL4"] and minValue > 50:
+                    minValue = 50
+                    minIndex = hand.index(card)
             return minIndex
         
 
@@ -80,41 +67,29 @@ class MostValueAgent(Agent):
         def __init__(self):
             super().__init__()
         
-        def step(self, state_dict, actions_dict, hand):
+        def step(self, state_dict, actions_dict, hand, card_open):
             """
             Choose the action with the highest Q-value.
             Required parameters:
                 - state_dict as dict
                 - actions_dict as dict
             """
-            actions_possible = [key for key,val in actions_dict.items() if val != 0]
-
             maxValue = 0
             maxIndex = 0
-            print("actionsDict", actions_dict)
-            print("actionsPossible", actions_possible)
+
             for card in hand:
-                print("numero", card)
-                print("max:", maxValue)
-                print("card.value:", card.value)
-                print("type", type(card.value))
-                if type(card.value) != str and card.value != 0 and card.value > maxValue and (card.color in actions_possible):
-                    print("é possivel")
+                if type(card.value) != str and (card.value == card_open.value or card.color == card_open.color) and card.value > maxValue:
                     maxValue = card.value
                     maxIndex = hand.index(card)
-                    print("index:", hand.index(card))
-                elif card.value in ["SKI", "REV", "PL2"] and card.value in actions_possible:
+
+                elif card.value in ["SKI", "REV", "PL2"] and (card.color == card_open.color or card.value == card_open.value):
                     if 20 > maxValue:
                         maxValue = 20
                         maxIndex = hand.index(card)
-                    print("index:", hand.index(card))
                 elif card.value in ["COL", "PL4"]:
                     if 50 > maxValue:
                         maxValue = 50
                         maxIndex = hand.index(card)
-                    print("index:", hand.index(card))
-            print("indexMaxFinal:", maxIndex)
-            print("indexFinal:", hand[maxIndex].color)
             return maxIndex
         
 
@@ -139,7 +114,7 @@ class CardCounterAgent(Agent):
         # 0 = red, 1 = blue, 2 = green, 3 = yellow, 4 = wild
         self.probMatrix = [0,0,0,0,0]
 
-    def step(self, state_dict, actions_dict, hand):
+    def step(self, state_dict, actions_dict, hand, card_open):
         
         actions_possible = [key for key,val in actions_dict.items() if val != 0]
         minValue = 1000
@@ -168,7 +143,7 @@ class RandomAgent(Agent):
     def __init__(self):
         super().__init__()
     
-    def step(self, state_dict, actions_dict, hand):
+    def step(self, state_dict, actions_dict, hand, card_open):
         """
         Choose a random action.
         Required parameters:
@@ -199,7 +174,7 @@ class QLearningAgent(Agent):
         self.prev_state  = 0
         self.prev_action = 0
     
-    def step(self, state_dict, actions_dict, hand):
+    def step(self, state_dict, actions_dict, hand, card_open):
         """
         Choose the optimal next action according to the followed policy.
         Required parameters:
@@ -279,7 +254,7 @@ class MonteCarloAgent(Agent):
         self.action_seen = list()
         self.q_seen      = list()
     
-    def step(self, state_dict, actions_dict, hand):
+    def step(self, state_dict, actions_dict, hand, card_open):
         """
         Choose the optimal next action according to the followed policy.
         Required parameters:

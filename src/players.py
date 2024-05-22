@@ -45,7 +45,6 @@ class Player(object):
 
         if isinstance(self.agent, CardCounterAgent): 
             self.agent.drawn += 1
-            #print("drawn", self.agent.drawn)
             if card.color == "RED":
                 self.agent.probMatrix[0] += 1
             elif card.color == "GRE":
@@ -132,48 +131,49 @@ class Player(object):
             - deck as deck
             - card_open as card
         """
+
         # Identify state & actions for action selection
         self.identify_state(card_open)
         self.identify_action()
-        
-        # Agent selects action
-        self.action = agent.step(self.state, self.actions, self.hand)
+
+        self.action = agent.step(self.state, self.actions, self.hand, card_open)
 
         # Selected action searches corresponding card
         # (1) Playing wild card
         if isinstance(agent, MostValueAgent):
             self.card_play = self.hand[self.action]
             card = self.card_play
-            print("carta do if", card)
+
         if isinstance(agent, LeastValueAgent):
+
             self.card_play = self.hand[self.action]
             card = self.card_play
-            print("carta do if", card)
+
         if self.action in ["COL","PL4"] and not isinstance(agent, MostValueAgent) and not isinstance(agent, LeastValueAgent):
             for card in self.hand:            
                 if card.value == self.action:
-                    print("caiu1")
+
                     break
 
         # (2) Playing normal card with different color
         elif (self.action in ["RED","GRE","BLU", "YEL"]) and (self.action != card_open.color) and not isinstance(agent, MostValueAgent) and not isinstance(agent, LeastValueAgent):
             for card in self.hand:
                 if (card.color == self.action) and (card.value == card_open.value):
-                    print("caiu2")
+
                     break
 
         # (3) Playing normal card with same color
         elif (self.action in ["RED","GRE","BLU", "YEL"]) and (self.action == card_open.color) and not isinstance(agent, MostValueAgent) and not isinstance(agent, LeastValueAgent):
             for card in self.hand:
                 if (card.color == self.action) and (card.value in range(0,10)):
-                    print("caiu3")
+
                     break
 
         # (4) Playing special card with same color
         elif (self.action not in ["RED","GRE","BLU", "YEL"]) and (self.action != card_open.value) and not isinstance(agent, MostValueAgent) and not isinstance(agent, LeastValueAgent):
             for card in self.hand:
                 if (card.color == card_open.color) and (card.value == self.action):
-                    print("caiu4")
+
                     break
 
         # (5) Playing special card with different color
@@ -181,13 +181,11 @@ class Player(object):
             if not isinstance(agent, MostValueAgent) and not isinstance(agent, LeastValueAgent):
                 for card in self.hand:
                     if card.value == self.action:
-                        print("caiu5")
                         break
 
         # Selected card is played
         if not isinstance(agent, MostValueAgent) and not isinstance(agent, LeastValueAgent):
             self.card_play = card
-        print("cartaPlayers", card)
         self.hand.remove(card)
         self.hand_play.pop()
         deck.discard(card)
