@@ -373,4 +373,7 @@ def tournament(iterations, agents, comment):
     handValueList = [hand_value_player_1_list, hand_value_player_2_list, hand_value_player_3_list, hand_value_player_4_list]
     finalPointsList = [hand_value_player_1_cumsum, hand_value_player_2_cumsum, hand_value_player_3_cumsum, hand_value_player_4_cumsum]
 
+
+    if isinstance(agent3, RLOneAgent):
+        return winners, turns, agent2, cardPlayedList, handValueList, finalPointsList, agent3
     return winners, turns, agent2, cardPlayedList, handValueList, finalPointsList

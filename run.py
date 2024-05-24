@@ -40,8 +40,15 @@ def main():
     print("winrate player 3: ", result["win_rate_player_3"].iloc[-1])
     print("winrate player 4: ", result["win_rate_player_4"].iloc[-1])
 
-    q_vals = pd.DataFrame(run[2].q)
-    q_vals.index.rename("id", inplace=True)
+    if conf.params["agents"][2] == "RLOne":
+        print("here")
+        q_vals = pd.DataFrame(run[6].q)
+        q_vals.index.rename("id", inplace=True)
+
+        if not os.path.exists("assets"):
+            os.makedirs("assets")
+
+        q_vals.to_csv("assets/q-values.csv", index=True)
 
     # Add columns for the total number of cards played by each player
     result["cards_played_player_1"] = run[3][0]
@@ -60,12 +67,7 @@ def main():
     result["score_player_3"] = run[5][2]
     result["score_player_4"] = run[5][3]
 
-    if not os.path.exists("assets"):
-        os.makedirs("assets")
-
-    q_vals.to_csv("assets/q-values.csv", index=True)
     result.to_csv("assets/results.csv", index=False) 
-    
 
 if __name__ == "__main__":
     main()
