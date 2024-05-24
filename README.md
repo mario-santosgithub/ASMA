@@ -1,6 +1,6 @@
 # Autonomous Agents and Multi-Agent System
 
-### Group 9: 
+### Group 27: 
 Vadym Volkovinskyy 86524  
 Daniel Gomes 99195  
 Mário Santos 99275
