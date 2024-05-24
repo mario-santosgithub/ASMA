@@ -41,7 +41,6 @@ def main():
     print("winrate player 4: ", result["win_rate_player_4"].iloc[-1])
 
     if conf.params["agents"][2] == "RLOne":
-        print("here")
         q_vals = pd.DataFrame(run[6].q)
         q_vals.index.rename("id", inplace=True)
 
