@@ -16,7 +16,7 @@ params = {
         "CardCounter",
         "MostValue",
         "LeastValue"
-    ], # ["q-learning", "monte-carlo"]
+    ],
     "logging": False
 }
 
